@@ -6,7 +6,9 @@ on:
       - main
   schedule:
     - cron: '10 12 * * *'
-
+permissions:
+  contents: write  # 关键：授予推送权限
+  
 jobs:
   build:
     runs-on: ubuntu-latest
