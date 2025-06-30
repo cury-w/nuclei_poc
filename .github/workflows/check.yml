@@ -14,6 +14,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        ref: main #避免分离头状态
 
     - name: Set up Python
       uses: actions/setup-python@v4
