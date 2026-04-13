@@ -1,0 +1,56 @@
+id: blogger-detect
+
+info:
+  name: Blogger Detection
+  author: Chirag Mistry
+  severity: info
+  description: |
+    An instance running Blogger is detected by looking for specific HTTP headers, HTML tags, and known endpoints.
+  metadata:
+    verified: true
+    max-request: 7
+  tags: blogger,detect,tech
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+      - "{{BaseURL}}/robots.txt"
+      - "{{BaseURL}}/sitemap.xml"
+      - "{{BaseURL}}/favicon.ico"
+      - "{{BaseURL}}/blogger.js"
+      - "{{BaseURL}}/feeds/posts/default"
+      - "{{BaseURL}}/search"
+
+    stop-at-first-match: true
+    matchers-condition: and
+    matchers:
+      - type: word
+        part: response
+        words:
+          - "Powered by Blogger"
+          - "blogspot.com"
+          - "X-Powered-By-Blogger"
+          - "blogger.com"
+        condition: or
+        case-insensitive: true
+
+      - type: status
+        status:
+          - 200
+
+    extractors:
+      - type: regex
+        part: body
+        name: version
+        regex:
+          - 'Blogger ([0-9.]+)'
+          - 'Powered by Blogger ([0-9.]+)'
+
+      - type: regex
+        part: body
+        name: blogger_id
+        regex:
+          - 'blogger-id=([a-z0-9]+)'
+          - 'blogspot\.com/([^/]+)'
+# digest: 4a0a00473045022100c972ae60d784fda1494b02d17bb552bda0b4b7d78896a347e228fc534e7f3f7e0220209331593bbe9e09d0e7a526e572e179563a4167e5fb4f0c96ac0c63a4dc5f28:922c64590222798bb761d5b6d8e72950

@@ -1,0 +1,56 @@
+id: opencart-detect
+
+info:
+  name: OpenCart Detection
+  author: Chirag Mistry
+  severity: info
+  description: |
+    An instance running OpenCart is detected by looking for specific HTTP headers, HTML tags, and known endpoints.
+  metadata:
+    max-request: 8
+    shodan-query: http.component:"OpenCart"
+  tags: opencart,detect,tech
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+      - "{{BaseURL}}/robots.txt"
+      - "{{BaseURL}}/sitemap.xml"
+      - "{{BaseURL}}/favicon.ico"
+      - "{{BaseURL}}/admin"
+      - "{{BaseURL}}/catalog/view/javascript/opencart.js"
+      - "{{BaseURL}}/index.php?route=common/home"
+      - "{{BaseURL}}/oc-admin"
+
+    stop-at-first-match: true
+    matchers-condition: and
+    matchers:
+      - type: word
+        part: response
+        words:
+          - "Powered by OpenCart"
+          - "X-Powered-By-OpenCart"
+          - "OpenCart Store"
+        condition: or
+        case-insensitive: true
+
+      - type: status
+        status:
+          - 200
+
+    extractors:
+      - type: regex
+        part: body
+        name: version
+        regex:
+          - 'OpenCart ([0-9.]+)'
+          - 'Powered by OpenCart ([0-9.]+)'
+
+      - type: regex
+        part: body
+        name: opencart_id
+        regex:
+          - 'opencart-store-id=([a-z0-9]+)'
+          - 'oc-admin/([^/]+)'
+# digest: 490a00463044022067912080dcc6b805f2dd92cf41069122037cb7475705354bf5cd23d25932922002200d9010688e6f3f79b65775f7fe93fb6fa3c5899c865098df1224b57800a97cb5:922c64590222798bb761d5b6d8e72950
